@@ -1,0 +1,14 @@
+.git
+.env
+.env.*
+!.env.example
+node_modules
+.pnpm-store
+apps/web/node_modules
+apps/web/dist
+apps/web/coverage
+coverage.out
+.gocover
+*.exe
+*.test
+*.out

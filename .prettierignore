@@ -1,0 +1,10 @@
+pnpm-lock.yaml
+.pnpm-store
+apps/web/dist
+apps/web/coverage
+apps/web/src/api/schema.d.ts
+apps/web/src/components/ui
+apps/api/internal/repository
+contracts/openapi.yaml
+coverage.out
+.gocover
