@@ -1,0 +1,24 @@
+{
+  "name": "ms-reportes",
+  "private": true,
+  "packageManager": "pnpm@10.13.1",
+  "engines": {
+    "node": "22.22.0"
+  },
+  "scripts": {
+    "dev:web": "pnpm --filter @pingeso-civil/ms-reportes-ui dev",
+    "typecheck": "pnpm --filter @pingeso-civil/ms-reportes-ui typecheck",
+    "test": "pnpm --filter @pingeso-civil/ms-reportes-ui test",
+    "test:api": "cd apps/api && go test ./...",
+    "lint:api": "node scripts/lint-api.mjs",
+    "test:e2e:api": "node scripts/e2e-cover.mjs",
+    "codegen": "node scripts/codegen.mjs",
+    "verify": "pnpm exec prettier --check . && pnpm exec oxlint --deny-warnings apps/web && pnpm typecheck && pnpm test && pnpm --filter @pingeso-civil/ms-reportes-ui build && pnpm lint:api && pnpm test:api"
+  },
+  "devDependencies": {
+    "lefthook": "2.1.10",
+    "oxlint": "1.75.0",
+    "prettier": "3.9.6",
+    "prettier-plugin-tailwindcss": "0.8.1"
+  }
+}

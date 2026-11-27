@@ -1,0 +1,54 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "rules": {
+    "no-restricted-globals": [
+      "error",
+      {
+        "name": "localStorage",
+        "message": "localStorage está prohibido por el DAS §5 (usar cookie HttpOnly en el servidor)."
+      },
+      {
+        "name": "sessionStorage",
+        "message": "sessionStorage está prohibido por el DAS §5 (usar cookie HttpOnly en el servidor)."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["apps/web/src/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-globals": [
+          "error",
+          {
+            "name": "fetch",
+            "message": "fetch solo está permitido dentro de archivos *.api.ts (DAS §3 y §6)."
+          },
+          {
+            "name": "localStorage",
+            "message": "localStorage está prohibido por el DAS §5."
+          },
+          {
+            "name": "sessionStorage",
+            "message": "sessionStorage está prohibido por el DAS §5."
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/web/src/**/*.api.ts", "apps/web/src/**/*.test.{ts,tsx}"],
+      "rules": {
+        "no-restricted-globals": [
+          "error",
+          {
+            "name": "localStorage",
+            "message": "localStorage está prohibido por el DAS §5."
+          },
+          {
+            "name": "sessionStorage",
+            "message": "sessionStorage está prohibido por el DAS §5."
+          }
+        ]
+      }
+    }
+  ]
+}
