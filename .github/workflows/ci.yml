@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  postgres-local:
+    name: PostgreSQL con Docker Compose
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Validar Compose y levantar PostgreSQL
+        env:
+          POSTGRES_PASSWORD: ci-reportes-local
+        run: |
+          cp .env.example .env
+          docker compose config --quiet
+          docker compose up -d --wait --wait-timeout 120 postgres
+
+      - name: Verificar una consulta
+        run: docker compose exec -T postgres psql -U reportes -d reportes -v ON_ERROR_STOP=1 -c 'SELECT 1;'
+
+      - name: Mostrar logs si falla
+        if: failure()
+        run: docker compose logs postgres
