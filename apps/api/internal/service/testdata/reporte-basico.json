@@ -1,0 +1,14 @@
+{
+  "plantilla": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "titulo": "Resumen de documentos",
+    "columnas": [
+      { "campo": "codigo", "encabezado": "Código" },
+      { "campo": "estado", "encabezado": "Estado" }
+    ]
+  },
+  "datos": [
+    { "codigo": "DOC-001", "estado": "Aprobado" },
+    { "codigo": "DOC-002", "estado": "Pendiente" }
+  ]
+}
