@@ -1,0 +1,883 @@
+components:
+  schemas:
+    DatabaseStatus:
+      additionalProperties: false
+      properties:
+        connected:
+          description: Indica si PostgreSQL respondió al ping
+          examples:
+            - true
+          type: boolean
+        engine:
+          description: Motor de base de datos
+          examples:
+            - PostgreSQL
+          type: string
+        message:
+          description: Mensaje descriptivo del estado
+          examples:
+            - Base de datos conectada y operativa
+          type: string
+      required:
+        - connected
+        - engine
+        - message
+      type: object
+    ErrorDetail:
+      additionalProperties: false
+      properties:
+        location:
+          description: Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id'
+          type: string
+        message:
+          description: Error message text
+          type: string
+        value:
+          description: The value at the given location
+      type: object
+    ErrorModel:
+      additionalProperties: false
+      properties:
+        detail:
+          description: A human-readable explanation specific to this occurrence of the problem.
+          examples:
+            - Property foo is required but is missing.
+          type: string
+        errors:
+          description: Optional list of individual error details
+          items:
+            $ref: "#/components/schemas/ErrorDetail"
+          type:
+            - array
+            - "null"
+        instance:
+          description: A URI reference that identifies the specific occurrence of the problem.
+          examples:
+            - https://example.com/error-log/abc123
+          format: uri
+          type: string
+        status:
+          description: HTTP status code
+          examples:
+            - 400
+          format: int64
+          type: integer
+        title:
+          description: A short, human-readable summary of the problem type. This value should not change between occurrences of the error.
+          examples:
+            - Bad Request
+          type: string
+        type:
+          default: about:blank
+          description: A URI reference to human-readable documentation for the error.
+          examples:
+            - https://example.com/errors/example
+          format: uri
+          type: string
+      type: object
+    HealthResponse:
+      additionalProperties: false
+      properties:
+        database:
+          $ref: "#/components/schemas/DatabaseStatus"
+          description: Diagnóstico de conectividad con PostgreSQL
+        environment:
+          description: Entorno de ejecución
+          examples:
+            - development
+          type: string
+        line_of_work:
+          $ref: "#/components/schemas/LineOfWorkInfo"
+          description: Relaciones upstream, downstream y capacidades
+        role:
+          description: Rol dentro de la Línea de Productos de Software
+          examples:
+            - Gestor de Información
+          type: string
+        service_name:
+          description: Nombre del microservicio
+          examples:
+            - MS Gestor de Información
+          type: string
+        status:
+          description: Estado global del servicio (healthy o degraded)
+          examples:
+            - healthy
+          type: string
+        timestamp:
+          description: Marca temporal ISO-8601 en UTC
+          examples:
+            - "2026-11-20T12:00:00Z"
+          type: string
+        uptime:
+          description: Tiempo activo desde el arranque
+          examples:
+            - 1m30s
+          type: string
+      required:
+        - status
+        - service_name
+        - environment
+        - uptime
+        - timestamp
+        - database
+        - role
+        - line_of_work
+      type: object
+    LineOfWorkInfo:
+      additionalProperties: false
+      properties:
+        capabilities:
+          description: Capacidades expuestas por este microservicio
+          items:
+            type: string
+          type: array
+        consumers:
+          description: Servicios que consumen sus datos (downstream)
+          items:
+            type: string
+          type: array
+        depends_on:
+          description: Servicios de los que depende (upstream)
+          items:
+            type: string
+          type: array
+      required:
+        - depends_on
+        - consumers
+        - capabilities
+      type: object
+    ListaLotes:
+      additionalProperties: false
+      properties:
+        elementos:
+          description: Lotes de la página
+          items:
+            $ref: "#/components/schemas/Lote"
+          type: array
+        pagina:
+          description: Número de página actual (1-indexed)
+          examples:
+            - 1
+          format: int64
+          type: integer
+        tamano_pagina:
+          description: Cantidad máxima por página
+          examples:
+            - 50
+          format: int64
+          type: integer
+        total:
+          description: Total de elementos encontrados
+          examples:
+            - 42
+          format: int64
+          type: integer
+      required:
+        - elementos
+        - total
+        - pagina
+        - tamano_pagina
+      type: object
+    ListaRechazos:
+      additionalProperties: false
+      properties:
+        elementos:
+          description: Rechazos del lote
+          items:
+            $ref: "#/components/schemas/Rechazo"
+          type: array
+      required:
+        - elementos
+      type: object
+    ListaRegistros:
+      additionalProperties: false
+      properties:
+        elementos:
+          description: Registros aceptados de la página
+          items:
+            $ref: "#/components/schemas/Registro"
+          type: array
+        pagina:
+          description: Número de página actual (1-indexed)
+          examples:
+            - 1
+          format: int64
+          type: integer
+        tamano_pagina:
+          description: Cantidad máxima por página
+          examples:
+            - 50
+          format: int64
+          type: integer
+        total:
+          description: Total de elementos encontrados
+          examples:
+            - 42
+          format: int64
+          type: integer
+      required:
+        - elementos
+        - total
+        - pagina
+        - tamano_pagina
+      type: object
+    LivenessStatus:
+      additionalProperties: false
+      properties:
+        status:
+          description: Estado del proceso HTTP
+          examples:
+            - ok
+          type: string
+      required:
+        - status
+      type: object
+    Lote:
+      additionalProperties: false
+      properties:
+        aceptados:
+          description: Total de registros aceptados
+          examples:
+            - 12
+          format: int64
+          type: integer
+        creado_en:
+          description: Fecha de creación en UTC
+          format: date-time
+          type: string
+        id:
+          description: UUID del lote
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          format: uuid
+          type: string
+        origen:
+          description: Sistema emisor
+          examples:
+            - Extractor OCR
+          type: string
+        rechazados:
+          description: Total de registros rechazados
+          examples:
+            - 8
+          format: int64
+          type: integer
+        recibidos:
+          description: Total de registros recibidos
+          examples:
+            - 20
+          format: int64
+          type: integer
+        referencia_externa:
+          description: Referencia externa
+          examples:
+            - lote-2026-001
+          type: string
+      required:
+        - id
+        - origen
+        - referencia_externa
+        - recibidos
+        - aceptados
+        - rechazados
+        - creado_en
+      type: object
+    LoteDetalle:
+      additionalProperties: false
+      properties:
+        aceptados:
+          description: Total de registros aceptados
+          examples:
+            - 12
+          format: int64
+          type: integer
+        creado_en:
+          description: Fecha de creación en UTC
+          format: date-time
+          type: string
+        id:
+          description: UUID del lote
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          format: uuid
+          type: string
+        origen:
+          description: Sistema emisor
+          examples:
+            - Extractor OCR
+          type: string
+        rechazados:
+          description: Total de registros rechazados
+          examples:
+            - 8
+          format: int64
+          type: integer
+        rechazos:
+          description: Detalle de los registros rechazados
+          items:
+            $ref: "#/components/schemas/Rechazo"
+          type: array
+        recibidos:
+          description: Total de registros recibidos
+          examples:
+            - 20
+          format: int64
+          type: integer
+        referencia_externa:
+          description: Referencia externa
+          examples:
+            - lote-2026-001
+          type: string
+      required:
+        - rechazos
+        - id
+        - origen
+        - referencia_externa
+        - recibidos
+        - aceptados
+        - rechazados
+        - creado_en
+      type: object
+    Rechazo:
+      additionalProperties: false
+      properties:
+        folio:
+          description: Folio normalizado o vacío
+          examples:
+            - DOC-0001
+          type: string
+        motivos:
+          description: Códigos de motivo de rechazo
+          examples:
+            - - folio_duplicado
+          items:
+            type: string
+          type: array
+        posicion:
+          description: Posición 1-indexed dentro del lote
+          examples:
+            - 2
+          format: int64
+          type: integer
+      required:
+        - posicion
+        - folio
+        - motivos
+      type: object
+    Registro:
+      additionalProperties: false
+      properties:
+        correo:
+          description: Correo normalizado en minúsculas
+          examples:
+            - camila@example.com
+          type: string
+        creado_en:
+          description: Fecha de registro en UTC
+          format: date-time
+          type: string
+        folio:
+          description: Folio normalizado en mayúsculas
+          examples:
+            - DOC-0001
+          type: string
+        id:
+          description: UUID del registro
+          examples:
+            - 660e8400-e29b-41d4-a716-446655440000
+          format: uuid
+          type: string
+        lote_id:
+          description: UUID del lote al que pertenece
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          format: uuid
+          type: string
+        nombre:
+          description: Nombre normalizado
+          examples:
+            - Camila Soto
+          type: string
+        posicion:
+          description: Posición 1-indexed dentro del lote original
+          examples:
+            - 1
+          format: int64
+          type: integer
+      required:
+        - id
+        - lote_id
+        - posicion
+        - folio
+        - nombre
+        - correo
+        - creado_en
+      type: object
+    RegistroEntrada:
+      additionalProperties: false
+      properties:
+        correo:
+          description: Correo electrónico de contacto
+          examples:
+            - camila@example.com
+          maxLength: 254
+          type: string
+        folio:
+          description: Folio identificador del documento
+          examples:
+            - DOC-0001
+          maxLength: 254
+          type: string
+        nombre:
+          description: Nombre completo del titular
+          examples:
+            - Camila Soto
+          maxLength: 254
+          type: string
+      required:
+        - folio
+        - nombre
+        - correo
+      type: object
+    SolicitudLote:
+      additionalProperties: false
+      properties:
+        origen:
+          description: Sistema emisor del lote
+          examples:
+            - Extractor OCR
+          maxLength: 254
+          type: string
+        referencia_externa:
+          description: Identificador de correlación en el emisor
+          examples:
+            - lote-2026-001
+          maxLength: 254
+          type: string
+        registros:
+          description: Lista de registros a procesar (entre 1 y 5000)
+          items:
+            $ref: "#/components/schemas/RegistroEntrada"
+          maxItems: 5000
+          minItems: 1
+          type: array
+      required:
+        - origen
+        - referencia_externa
+        - registros
+      type: object
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      description: JWT firmado (EdDSA o RS256) reenviado entre microservicios
+      scheme: bearer
+      type: http
+    cookieAuth:
+      description: JWT firmado (EdDSA o RS256) emitido por el servicio de identidad en cookie HttpOnly
+      in: cookie
+      name: session
+      type: apiKey
+info:
+  description: Recibe lotes de registros desde el extractor OCR, los limpia y valida, y guarda los registros aceptados en PostgreSQL para que otros servicios, como el motor de reportes, los consulten.
+  title: MS Gestor de Información API
+  version: 1.0.0
+openapi: 3.1.0
+paths:
+  /api/health:
+    get:
+      operationId: get-health
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Diagnóstico de salud del servicio y PostgreSQL
+      tags:
+        - Diagnóstico
+  /api/v1/lotes:
+    get:
+      operationId: list-lotes
+      parameters:
+        - description: Número de página (1-indexed)
+          example: 1
+          explode: false
+          in: query
+          name: pagina
+          schema:
+            default: 1
+            description: Número de página (1-indexed)
+            examples:
+              - 1
+            minimum: 1
+            type: integer
+        - description: Cantidad de lotes por página
+          example: 50
+          explode: false
+          in: query
+          name: tamano_pagina
+          schema:
+            default: 50
+            description: Cantidad de lotes por página
+            examples:
+              - 50
+            maximum: 200
+            minimum: 1
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListaLotes"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+        - {}
+      summary: Listar lotes procesados del más reciente al más antiguo
+      tags:
+        - Lotes
+      x-required-permission: lotes:leer
+    post:
+      operationId: create-lote
+      parameters:
+        - description: Clave de idempotencia para evitar duplicados en reintentos
+          example: lote-2026-001
+          in: header
+          name: Idempotency-Key
+          schema:
+            description: Clave de idempotencia para evitar duplicados en reintentos
+            examples:
+              - lote-2026-001
+            maxLength: 128
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SolicitudLote"
+          text/csv:
+            schema:
+              type: string
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoteDetalle"
+          description: Reintento idempotente exitoso del lote
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoteDetalle"
+          description: Created
+          headers:
+            Location:
+              schema:
+                description: URI del lote creado
+                type: string
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+        - {}
+      summary: Recibir, limpiar y validar un lote de registros (JSON o CSV)
+      tags:
+        - Lotes
+      x-required-permission: lotes:operar
+  /api/v1/lotes/{id}:
+    get:
+      operationId: get-lote
+      parameters:
+        - description: UUID del recurso
+          example: 550e8400-e29b-41d4-a716-446655440000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: UUID del recurso
+            examples:
+              - 550e8400-e29b-41d4-a716-446655440000
+            format: uuid
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoteDetalle"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+        - {}
+      summary: Obtener el detalle de un lote y sus rechazos
+      tags:
+        - Lotes
+      x-required-permission: lotes:leer
+  /api/v1/lotes/{id}/rechazos:
+    get:
+      operationId: list-lote-rechazos
+      parameters:
+        - description: UUID del recurso
+          example: 550e8400-e29b-41d4-a716-446655440000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: UUID del recurso
+            examples:
+              - 550e8400-e29b-41d4-a716-446655440000
+            format: uuid
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListaRechazos"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+        - {}
+      summary: Listar los registros rechazados de un lote
+      tags:
+        - Lotes
+      x-required-permission: lotes:leer
+  /api/v1/mocks/datos-sucios:
+    get:
+      operationId: get-mocks-datos-sucios
+      parameters:
+        - description: Cantidad de registros simulados a generar
+          example: 20
+          explode: false
+          in: query
+          name: cantidad
+          schema:
+            default: 20
+            description: Cantidad de registros simulados a generar
+            examples:
+              - 20
+            maximum: 5000
+            minimum: 1
+            type: integer
+        - description: Formato de salida (json o csv)
+          example: json
+          explode: false
+          in: query
+          name: formato
+          schema:
+            default: json
+            description: Formato de salida (json o csv)
+            enum:
+              - json
+              - csv
+            examples:
+              - json
+            type: string
+        - description: Semilla opcional para generación determinista
+          example: 7
+          explode: false
+          in: query
+          name: semilla
+          schema:
+            description: Semilla opcional para generación determinista
+            examples:
+              - 7
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SolicitudLote"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Generar lote simulado de datos sucios de OCR (solo entornos de desarrollo/prueba)
+      tags:
+        - Mocks
+  /api/v1/registros:
+    get:
+      operationId: list-registros
+      parameters:
+        - description: Número de página (1-indexed)
+          example: 1
+          explode: false
+          in: query
+          name: pagina
+          schema:
+            default: 1
+            description: Número de página (1-indexed)
+            examples:
+              - 1
+            minimum: 1
+            type: integer
+        - description: Cantidad de registros por página
+          example: 50
+          explode: false
+          in: query
+          name: tamano_pagina
+          schema:
+            default: 50
+            description: Cantidad de registros por página
+            examples:
+              - 50
+            maximum: 200
+            minimum: 1
+            type: integer
+        - description: Filtro opcional por folio exacto (se normaliza a mayúsculas)
+          example: DOC-0001
+          explode: false
+          in: query
+          name: folio
+          schema:
+            description: Filtro opcional por folio exacto (se normaliza a mayúsculas)
+            examples:
+              - DOC-0001
+            type: string
+        - description: Filtro opcional por UUID de lote
+          example: 550e8400-e29b-41d4-a716-446655440000
+          explode: false
+          in: query
+          name: lote_id
+          schema:
+            description: Filtro opcional por UUID de lote
+            examples:
+              - 550e8400-e29b-41d4-a716-446655440000
+            format: uuid
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListaRegistros"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+        - {}
+      summary: Listar registros limpios y validados
+      tags:
+        - Registros
+      x-required-permission: registros:leer
+  /api/v1/registros/{id}:
+    get:
+      operationId: get-registro
+      parameters:
+        - description: UUID del recurso
+          example: 550e8400-e29b-41d4-a716-446655440000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: UUID del recurso
+            examples:
+              - 550e8400-e29b-41d4-a716-446655440000
+            format: uuid
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Registro"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+        - {}
+      summary: Obtener un registro validado por su UUID
+      tags:
+        - Registros
+      x-required-permission: registros:leer
+  /healthz:
+    get:
+      operationId: get-healthz
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LivenessStatus"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Liveness probe del contenedor API (vivo)
+      tags:
+        - Diagnóstico
+  /readyz:
+    get:
+      operationId: get-readyz
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Readiness probe del contenedor API con verificación de PostgreSQL
+      tags:
+        - Diagnóstico
